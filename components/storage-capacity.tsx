@@ -24,42 +24,42 @@ export default function StorageCapacity() {
   }, [])
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Storage Capacity</CardTitle>
-        <CardDescription>Monitor your drop point storage utilization</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">Utilization</p>
-              <p className="text-3xl font-bold">{storage.utilization}%</p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Storage Capacity</CardTitle>
+          <CardDescription>Monitor your drop point storage utilization</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Utilization</p>
+                <p className="text-3xl font-bold">{storage.utilization}%</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium">Available Slots</p>
+                <p className="text-3xl font-bold">
+                  {storage.availableSlots}/{storage.totalSlots}
+                </p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm font-medium">Available Slots</p>
-              <p className="text-3xl font-bold">
-                {storage.availableSlots}/{storage.totalSlots}
-              </p>
+            <Progress value={storage.utilization} className="h-2" />
+            <div className="grid grid-cols-3 gap-4 text-center text-sm">
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-2">
+                <p className="font-medium">Processing</p>
+                <p className="text-lg">5</p>
+              </div>
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-2">
+                <p className="font-medium">In Stock</p>
+                <p className="text-lg">24</p>
+              </div>
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-2">
+                <p className="font-medium">Ready for Pickup</p>
+                <p className="text-lg">6</p>
+              </div>
             </div>
           </div>
-          <Progress value={storage.utilization} className="h-2" />
-          <div className="grid grid-cols-3 gap-4 text-center text-sm">
-            <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-2">
-              <p className="font-medium">Processing</p>
-              <p className="text-lg">5</p>
-            </div>
-            <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-2">
-              <p className="font-medium">In Stock</p>
-              <p className="text-lg">24</p>
-            </div>
-            <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-2">
-              <p className="font-medium">Ready for Pickup</p>
-              <p className="text-lg">6</p>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
   )
 }

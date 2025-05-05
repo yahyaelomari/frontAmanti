@@ -58,12 +58,12 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
     "zod": "^3.24.1",
-    "@emotion/react": "latest",
-    "@emotion/styled": "latest",
-    "@mui/material-pigment-css": "latest",
     "@mui/material": "latest",
     "axios": "latest",
-    "@mui/icons-material": "latest"
+    "@mui/icons-material": "latest",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.4",
+    "react-leaflet": "^4.2.1"
   },
   "devDependencies": {
     "@types/node": "^22",
