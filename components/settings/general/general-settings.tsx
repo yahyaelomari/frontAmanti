@@ -1,12 +1,10 @@
 "use client"
 
-import type React from "react"
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { DropPointInfoForm } from "./drop-point-info-form"
 import { BusinessHoursForm } from "./business-hours-form"
 import { LocationForm } from "./location-form"
+import { Button } from "@/components/ui/button"
 
 interface GeneralSettingsProps {
     dropPoint: {
@@ -28,27 +26,25 @@ export function GeneralSettings({
                                     onInputChange,
                                     onTimeChange,
                                     onLocationChange,
-                                    onSave,
+                                    onSave
                                 }: GeneralSettingsProps) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Drop Point Information</CardTitle>
-                <CardDescription>Manage your drop point details</CardDescription>
+                <CardTitle>General Settings</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
                 <DropPointInfoForm
                     name={dropPoint.name}
                     description={dropPoint.description}
-                    onNameChange={onInputChange}
-                    onDescriptionChange={onInputChange}
+                    onInputChange={onInputChange}
                 />
 
                 <BusinessHoursForm
-                    openingTime={dropPoint.openingTime}
-                    closingTime={dropPoint.closingTime}
-                    onOpeningTimeChange={(value) => onTimeChange("openingTime", value)}
-                    onClosingTimeChange={(value) => onTimeChange("closingTime", value)}
+                    openingTime={dropPoint.openingTime.split(':').slice(0, 2).join(':')}
+                    closingTime={dropPoint.closingTime.split(':').slice(0, 2).join(':')}
+                    onOpeningTimeChange={(v) => onTimeChange('openingTime', `${v}:00`)}
+                    onClosingTimeChange={(v) => onTimeChange('closingTime', `${v}:00`)}
                 />
 
                 <LocationForm

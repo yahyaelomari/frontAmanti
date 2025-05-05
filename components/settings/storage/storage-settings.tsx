@@ -1,10 +1,8 @@
 "use client"
 
-import type React from "react"
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { StorageCapacityForm } from "./storage-capacity-form"
+import { Button } from "@/components/ui/button"
 
 interface StorageSettingsProps {
     storage: {
@@ -20,15 +18,14 @@ export function StorageSettings({ storage, onStorageChange, onSave }: StorageSet
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Storage Information</CardTitle>
-                <CardDescription>Manage your storage capacity</CardDescription>
+                <CardTitle>Storage Settings</CardTitle>
             </CardHeader>
             <CardContent>
                 <StorageCapacityForm
                     totalSlots={storage.totalSlots}
                     availableSlots={storage.availableSlots}
                     utilization={storage.utilization}
-                    onTotalSlotsChange={onStorageChange}
+                    onStorageChange={onStorageChange}
                 />
             </CardContent>
             <CardFooter>

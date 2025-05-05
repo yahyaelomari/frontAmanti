@@ -4,7 +4,7 @@ import type React from "react"
 
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider, createTheme } from "@mui/material/styles"
+import { ThemeProvider, createTheme } from '@mui/material/styles'
 import CssBaseline from "@mui/material/CssBaseline"
 import Box from "@mui/material/Box"
 import { useState, useMemo } from "react"

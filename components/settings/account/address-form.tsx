@@ -1,38 +1,60 @@
 "use client"
 
-import type React from "react"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
 
 interface AddressFormProps {
-    street: string
-    city: string
-    state: string
-    zipCode: string
-    onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+    address: {
+        street: string
+        city: string
+        state: string
+        zipCode: string
+    }
+    onAddressInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export function AddressForm({ street, city, state, zipCode, onInputChange }: AddressFormProps) {
+export function AddressForm({ address, onAddressInputChange }: AddressFormProps) {
     return (
-        <div className="space-y-4">
-            <div className="space-y-2">
-                <Label htmlFor="street">Street</Label>
-                <Input id="street" name="street" value={street} onChange={onInputChange} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+        <>
+            <Separator className="my-4" />
+            <h3 className="text-sm font-medium">Address</h3>
+            <div className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
-                    <Input id="city" name="city" value={city} onChange={onInputChange} />
+                    <Label>Street</Label>
+                    <Input
+                        name="street"
+                        value={address.street}
+                        onChange={onAddressInputChange}
+                    />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label>City</Label>
+                        <Input
+                            name="city"
+                            value={address.city}
+                            onChange={onAddressInputChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>State</Label>
+                        <Input
+                            name="state"
+                            value={address.state}
+                            onChange={onAddressInputChange}
+                        />
+                    </div>
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="state">State</Label>
-                    <Input id="state" name="state" value={state} onChange={onInputChange} />
+                    <Label>Zip Code</Label>
+                    <Input
+                        name="zipCode"
+                        value={address.zipCode}
+                        onChange={onAddressInputChange}
+                    />
                 </div>
             </div>
-            <div className="space-y-2">
-                <Label htmlFor="zipCode">Zip Code</Label>
-                <Input id="zipCode" name="zipCode" value={zipCode} onChange={onInputChange} />
-            </div>
-        </div>
+        </>
     )
 }

@@ -1,194 +1,181 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { GeneralSettings } from "@/components/settings/general/general-settings"
 import { AccountSettings } from "@/components/settings/account/account-settings"
 import { StorageSettings } from "@/components/settings/storage/storage-settings"
+import { fetchDropPointProfile, updateDropPointProfile } from "@/lib/api"
 
 export default function SettingsPage() {
   const { toast } = useToast()
-  const [openingTime, setOpeningTime] = useState("09:00")
-  const [closingTime, setClosingTime] = useState("18:00")
-
-  // For ID card images
+  const [loading, setLoading] = useState(true)
+  const [dropPoint, setDropPoint] = useState<any>(null)
+  const [idCardFrontFile, setIdCardFrontFile] = useState<File | null>(null)
+  const [idCardBackFile, setIdCardBackFile] = useState<File | null>(null)
   const [idCardFrontPreview, setIdCardFrontPreview] = useState<string | null>(null)
   const [idCardBackPreview, setIdCardBackPreview] = useState<string | null>(null)
 
-  // Mock drop point data
-  const [dropPoint, setDropPoint] = useState({
-    name: "Central Drop Point",
-    description: "Centrally located drop point offering convenient package pickup and delivery services.",
-    openingTime: "09:00",
-    closingTime: "18:00",
-    latitude: 35.6895,
-    longitude: 139.6917,
-    account: {
-      firstName: "John",
-      lastName: "Doe",
-      email: "john.doe@example.com",
-      phone: "+1234567890",
-      idCardFrontUrl: null,
-      idCardBackUrl: null,
-      address: {
-        street: "123 Main St",
-        city: "Anytown",
-        state: "State",
-        zipCode: "12345",
-      },
-    },
-    storage: {
-      totalSlots: 50,
-      availableSlots: 35,
-      utilization: 0.3,
-    },
-  })
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await fetchDropPointProfile()
+        if (data) {
+          setDropPoint(data)
+          if (data.identityCardFrontUrl) {
+            setIdCardFrontPreview(`http://localhost:8080${data.identityCardFrontUrl}`)
+          }
+          if (data.identityCardBackUrl) {
+            setIdCardBackPreview(`http://localhost:8080${data.identityCardBackUrl}`)
+          }
+        }
+      } catch (error) {
+        toast({ title: "Error", description: "Failed to load data", variant: "destructive" })
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
+  }, [])
 
-  const handleSave = (section: string) => {
-    toast({
-      title: "Settings saved",
-      description: `Your ${section} settings have been updated.`,
-    })
-  }
+  const handleSave = async (section: string) => {
+    if (!dropPoint) return;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setDropPoint((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
-
-  const handleAccountInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setDropPoint((prev) => ({
-      ...prev,
-      account: {
-        ...prev.account,
-        [name]: value,
-      },
-    }))
-  }
-
-  const handleAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setDropPoint((prev) => ({
-      ...prev,
-      account: {
-        ...prev.account,
-        address: {
-          ...prev.account?.address,
-          [name]: value,
+    try {
+      // Prepare the data structure matching your backend's DTO
+      const updateData = {
+        name: dropPoint.name,
+        description: dropPoint.description,
+        openingTime: dropPoint.openingTime,
+        closingTime: dropPoint.closingTime,
+        latitude: dropPoint.latitude,
+        longitude: dropPoint.longitude,
+        account: {
+          firstName: dropPoint.account.firstName,
+          lastName: dropPoint.account.lastName,
+          phone: dropPoint.account.phone,
+          // Add missing required fields
+          email: dropPoint.account.email,
+          role: "DROP_POINT",
+          address: {
+            street: dropPoint.account.address.street,
+            city: dropPoint.account.address.city,
+            state: dropPoint.account.address.state,
+            zipCode: dropPoint.account.address.zipCode
+          }
         },
-      },
-    }))
-  }
+        storage: {
+          totalSlots: dropPoint.storage.totalSlots
+        }
+      };
 
-  const handleStorageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    const numValue = Number.parseInt(value, 10)
+      // Handle file uploads
+      const getFile = async (url: string, defaultName: string) => {
+        if (!url) return new File([], defaultName);
+        try {
+          const response = await fetch(`http://localhost:8080${url}`);
+          const blob = await response.blob();
+          return new File([blob], url.split('/').pop() || defaultName, {
+            type: blob.type
+          });
+        } catch (error) {
+          console.error("Error fetching file:", url);
+          return new File([], defaultName);
+        }
+      };
 
-    setDropPoint((prev) => ({
-      ...prev,
-      storage: {
-        ...prev.storage,
-        [name]: numValue,
-      },
-    }))
-  }
+      const frontFile = idCardFrontFile ||
+          await getFile(dropPoint.identityCardFrontUrl, 'front.jpg');
+      const backFile = idCardBackFile ||
+          await getFile(dropPoint.identityCardBackUrl, 'back.jpg');
 
-  const handleTimeChange = (field: string, value: string) => {
-    setDropPoint((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
+      if (!(frontFile.size > 0 && backFile.size > 0)) {
+        throw new Error("Both ID card images are required");
+      }
 
-    if (field === "openingTime") {
-      setOpeningTime(value)
-    } else if (field === "closingTime") {
-      setClosingTime(value)
-    }
-  }
+      await updateDropPointProfile(updateData, frontFile, backFile);
 
-  const handleLocationChange = (lat: number, lng: number) => {
-    setDropPoint((prev) => ({
-      ...prev,
-      latitude: lat,
-      longitude: lng,
-    }))
-  }
-
-  const handleIdCardFrontChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      const imageUrl = URL.createObjectURL(file)
-      setIdCardFrontPreview(imageUrl)
-
-      // In a real app, you would upload the file to your server here
       toast({
-        title: "ID Card Front Selected",
-        description: "The front image of your ID card has been selected.",
-      })
-    }
-  }
+        title: "Success!",
+        description: "Settings updated successfully",
+      });
 
-  const handleIdCardBackChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      const imageUrl = URL.createObjectURL(file)
-      setIdCardBackPreview(imageUrl)
+      // Refresh data after update
+      const updatedData = await fetchDropPointProfile();
+      setDropPoint(updatedData);
 
-      // In a real app, you would upload the file to your server here
+    } catch (error) {
+      console.error("Update failed:", error);
       toast({
-        title: "ID Card Back Selected",
-        description: "The back image of your ID card has been selected.",
-      })
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive",
+      });
     }
+  };
+
+  const fetchExistingFile = async (url: string): Promise<File> => {
+    const response = await fetch(`http://localhost:8080${url}`)
+    const blob = await response.blob()
+    return new File([blob], url.split('/').pop() || 'file.jpg', { type: blob.type })
   }
+
+  const handleIdCardChange = (type: 'front' | 'back', file: File) => {
+    const preview = URL.createObjectURL(file)
+    type === 'front' ? setIdCardFrontPreview(preview) : setIdCardBackPreview(preview)
+    type === 'front' ? setIdCardFrontFile(file) : setIdCardBackFile(file)
+  }
+
+  if (loading) return <div className="h-64 flex items-center justify-center">Loading...</div>
+  if (!dropPoint) return <div className="h-64 flex items-center justify-center">No data found</div>
 
   return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Settings</h1>
-        </div>
-
+        <h1 className="text-3xl font-bold">Settings</h1>
         <Tabs defaultValue="general">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid grid-cols-3">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="account">Account</TabsTrigger>
             <TabsTrigger value="storage">Storage</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="general" className="space-y-6">
+          <TabsContent value="general">
             <GeneralSettings
                 dropPoint={dropPoint}
-                onInputChange={handleInputChange}
-                onTimeChange={handleTimeChange}
-                onLocationChange={handleLocationChange}
+                onInputChange={(e) => setDropPoint(p => ({ ...p, [e.target.name]: e.target.value }))}
+                onTimeChange={(field, value) => setDropPoint(p => ({ ...p, [field]: value }))}
+                onLocationChange={(lat, lng) => setDropPoint(p => ({ ...p, latitude: lat, longitude: lng }))}
                 onSave={() => handleSave("general")}
             />
           </TabsContent>
 
-          <TabsContent value="account" className="space-y-6">
+          <TabsContent value="account">
             <AccountSettings
                 account={dropPoint.account}
                 idCardFrontPreview={idCardFrontPreview}
                 idCardBackPreview={idCardBackPreview}
-                onAccountInputChange={handleAccountInputChange}
-                onAddressInputChange={handleAddressInputChange}
-                onIdCardFrontChange={handleIdCardFrontChange}
-                onIdCardBackChange={handleIdCardBackChange}
+                onAccountInputChange={(e) => setDropPoint(p => ({
+                  ...p,
+                  account: { ...p.account, [e.target.name]: e.target.value }
+                }))}
+                onAddressInputChange={(e) => setDropPoint(p => ({
+                  ...p,
+                  account: { ...p.account, address: { ...p.account.address, [e.target.name]: e.target.value } }
+                }))}
+                onIdCardFrontChange={(e) => e.target.files?.[0] && handleIdCardChange('front', e.target.files[0])}
+                onIdCardBackChange={(e) => e.target.files?.[0] && handleIdCardChange('back', e.target.files[0])}
                 onSave={() => handleSave("account")}
             />
           </TabsContent>
 
-          <TabsContent value="storage" className="space-y-6">
+          <TabsContent value="storage">
             <StorageSettings
                 storage={dropPoint.storage}
-                onStorageChange={handleStorageChange}
+                onStorageChange={(e) => setDropPoint(p => ({
+                  ...p,
+                  storage: { ...p.storage, [e.target.name]: Number(e.target.value) }
+                }))}
                 onSave={() => handleSave("storage")}
             />
           </TabsContent>

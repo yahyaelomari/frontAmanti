@@ -340,8 +340,8 @@ function getPaymentTrendsData(timeRange: string) {
     const randomVariation = 0.8 + Math.random() * 0.4
     const trend = 1 + (days - i) * 0.003
 
-    const shopifyBase = 350 // Shopify payments are higher
-    const codBase = 150 // COD payments are lower
+    const shopifyBase = 350 // Shopify payment are higher
+    const codBase = 150 // COD payment are lower
 
     const shopify = Math.round(shopifyBase * weekendFactor * randomVariation * trend)
     const cod = Math.round(codBase * weekendFactor * randomVariation * trend)

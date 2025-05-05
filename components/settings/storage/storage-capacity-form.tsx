@@ -1,39 +1,50 @@
 "use client"
 
-import type React from "react"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 interface StorageCapacityFormProps {
     totalSlots: number
     availableSlots: number
     utilization: number
-    onTotalSlotsChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+    onStorageChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export function StorageCapacityForm({
                                         totalSlots,
                                         availableSlots,
                                         utilization,
-                                        onTotalSlotsChange,
+                                        onStorageChange,
                                     }: StorageCapacityFormProps) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-                <Label htmlFor="totalSlots">Total Slots</Label>
-                <Input id="totalSlots" name="totalSlots" type="number" value={totalSlots} onChange={onTotalSlotsChange} />
+                <Label>Total Slots</Label>
+                <Input
+                    name="totalSlots"
+                    type="number"
+                    value={totalSlots}
+                    onChange={onStorageChange}
+                    min="1"
+                />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="availableSlots">Available Slots</Label>
-                <Input id="availableSlots" name="availableSlots" type="number" value={availableSlots} disabled />
-                <p className="text-xs text-muted-foreground">This is managed automatically by the system</p>
+                <Label>Available Slots</Label>
+                <Input
+                    name="availableSlots"
+                    type="number"
+                    value={availableSlots}
+                    disabled
+                />
+                <p className="text-xs text-muted-foreground">
+                    Automatically calculated
+                </p>
             </div>
             <div className="space-y-2">
-                <Label htmlFor="utilization">Utilization</Label>
+                <Label>Utilization</Label>
                 <div className="h-10 flex items-center px-3 border rounded-md bg-muted">
-                    {`${(utilization * 100).toFixed(1)}%`}
+                    {utilization.toFixed(1)}%
                 </div>
-                <p className="text-xs text-muted-foreground">Current storage utilization</p>
             </div>
         </div>
     )

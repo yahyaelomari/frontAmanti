@@ -25,7 +25,7 @@ export default function PendingPayments() {
   useEffect(() => {
     // Simulating API call
     const fetchPayments = async () => {
-      // const response = await fetch('/api/payments/pending');
+      // const response = await fetch('/api/payment/pending');
       // const data = await response.json();
       // setPayments(data);
 
@@ -76,7 +76,7 @@ export default function PendingPayments() {
   }
 
   const handleReconcileAll = () => {
-    // In a real app, you would call your API to reconcile all pending payments
+    // In a real app, you would call your API to reconcile all pending payment
     toast({
       title: "Payments reconciled",
       description: `${payments.length} payments have been reconciled`,
