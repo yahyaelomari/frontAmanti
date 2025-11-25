@@ -89,7 +89,7 @@ export default function ReturnsPage() {
             formData.append('photo', file)
             formData.append('reason', reason)
 
-            const response = await fetch(`http://localhost:8080/api/shipments/${selectedShipment.id}/initiate-return`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/shipments/${selectedShipment.id}/initiate-return`, {
                 method: 'PATCH',
                 body: formData
             })

@@ -39,7 +39,7 @@ const ShipmentDetailsDialog: React.FC<ShipmentDetailsDialogProps> = ({ open, shi
         if (path.startsWith('http')) return path
         // Remove leading './' if present
         const cleanPath = path.startsWith('./') ? path.substring(2) : path
-        return `http://localhost:8080/${cleanPath}`
+        return `${process.env.REACT_APP_BACKEND_URL}/${cleanPath}`
     }
 
     if (!shipment) return null

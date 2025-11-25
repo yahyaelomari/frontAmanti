@@ -24,10 +24,11 @@ export default function SettingsPage() {
         if (data) {
           setDropPoint(data)
           if (data.identityCardFrontUrl) {
-            setIdCardFrontPreview(`http://localhost:8080${data.identityCardFrontUrl}`)
+
+            setIdCardFrontPreview(`${process.env.REACT_APP_BACKEND_URL}${data.identityCardFrontUrl}`)
           }
           if (data.identityCardBackUrl) {
-            setIdCardBackPreview(`http://localhost:8080${data.identityCardBackUrl}`)
+            setIdCardBackPreview(`${process.env.REACT_APP_BACKEND_URL}${data.identityCardBackUrl}`)
           }
         }
       } catch (error) {
@@ -74,7 +75,7 @@ export default function SettingsPage() {
       const getFile = async (url: string, defaultName: string) => {
         if (!url) return new File([], defaultName);
         try {
-          const response = await fetch(`http://localhost:8080${url}`);
+          const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}${url}`);
           const blob = await response.blob();
           return new File([blob], url.split('/').pop() || defaultName, {
             type: blob.type
@@ -116,7 +117,7 @@ export default function SettingsPage() {
   };
 
   const fetchExistingFile = async (url: string): Promise<File> => {
-    const response = await fetch(`http://localhost:8080${url}`)
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}${url}`)
     const blob = await response.blob()
     return new File([blob], url.split('/').pop() || 'file.jpg', { type: blob.type })
   }

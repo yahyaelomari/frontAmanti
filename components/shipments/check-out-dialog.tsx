@@ -46,7 +46,7 @@ const CheckOutDialog: React.FC<CheckOutDialogProps> = ({
 
     try {
       const response = await axios.patch(
-          `http://localhost:8080/api/shipments/${shipment.id}/check-out`,
+          `${process.env.REACT_APP_BACKEND_URL}/api/shipments/${shipment.id}/check-out`,
           null, // No body for PATCH request
           {
             params: {
